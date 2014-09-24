@@ -1,0 +1,67 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          example
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OSGi Daemon Example Service
+# Description:       the OSGi Daemon Example Service
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
+
+NAME=example
+USER=example
+
+JSVC=/usr/bin/jsvc
+BASEDIR=/opt/example/$NAME
+LIBDIR=$BASEDIR/lib
+ETCDIR=$BASEDIR/etc
+RUNDIR=$BASEDIR/var/run
+LOGDIR=$BASEDIR/var/log
+PIDFILE=$RUNDIR/$NAME.pid
+CLASSPATH="$LIBDIR/commons-daemon.jar:$LIBDIR/org.apache.felix.framework-4.4.1.jar:$LIBDIR/com.seanbright.osgi.launcher-0.0.1.jar"
+
+case "$1" in
+	start)
+		log_daemon_msg "Starting $NAME"
+
+		$JSVC \
+			-java-home /usr/lib/jvm/java-8-oracle/ \
+			-cp $CLASSPATH \
+			-procname $NAME \
+			-outfile $LOGDIR/output.log \
+			-errfile $LOGDIR/error.log \
+			-pidfile $PIDFILE \
+			-cwd $RUNDIR \
+			com.seanbright.osgi.launcher.Daemon $ETCDIR/framework.properties
+
+		log_end_msg 0
+		;;
+	stop)
+		log_daemon_msg "Stopping $NAME"
+
+		$JSVC \
+			-java-home /usr/lib/jvm/java-8-oracle/ \
+			-pidfile $PIDFILE \
+			-stop \
+			com.seanbright.osgi.launcher.Daemon
+
+		log_end_msg 0
+		;;
+	restart)
+		$0 stop && sleep 2 && $0 start
+		;;
+	status)
+		status_of_proc -p $PIDFILE "n/a" $NAME
+		exit 0
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 2
+		;;
+esac

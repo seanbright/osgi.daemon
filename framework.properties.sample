@@ -1,0 +1,32 @@
+#
+# Sample Framework Properties file
+#
+# This is a standard Properties file conforming to the specification defined by
+# java.util.Properties.
+#
+# Additionally, substitutions are done on values surrounded by ${...}.  If the
+# identifier within the ${...}s begins with a hyphen, then the identified is
+# assumed to be a system property (accessed via System.getProperty)
+#
+
+#
+# launcher.autostart (if specified) should identify a directory containing
+# bundles that should be installed and started on startup.  Currently we just
+# install all of them in directory order and then (assuming they install)
+# start them in directory order.
+#
+
+launcher.autostart = /some/directory
+
+#
+# Example: Bundle cache location
+#
+
+runtime.files = /srv/osgi
+org.osgi.framework.storage = ${runtime.files}/bundle-cache
+
+#
+# Example: Using java.io.tmpdir
+#
+
+somebundle.temporary.directory = ${-java.io.tmpdir}/somebundle
